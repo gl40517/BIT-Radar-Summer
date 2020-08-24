@@ -1,4 +1,5 @@
 clear all; clc; close all;
+tic;
 %% 参数设置
 load('ball_256_32_1result.mat');
 fc = 77e9; %载频77GHz
@@ -13,16 +14,15 @@ N3 = 255;  %每帧的PRT数
 N_total = size(adcData,2); %adc采集的全部数据
 t = (0:N2-1)/fs;
 
-%% 单列每一帧的数据
+%% 整合4通道数据
 adcData_frame = zeros();
 for i = 1:4
     adcData_frame = reshape(adcData(i,:),N2*N3,N1)+adcData_frame;
 end
-adcData_frame = adcData_frame';
+adcData_frame = adcData_frame'/4;
 
 %% 对每一帧信号进行RD处理
-% Data = zeros();
-Rx = zeros(1,32);
+Rx = [];
 final_Data = zeros(N1,N3,N2);
 for i = 1:N1
     Data0 = reshape(adcData_frame(i,:),[N2,N3]); 
@@ -36,9 +36,9 @@ for i = 1:N1
     cfar_Data1 = cfar_Data;
     final_Data(i,:,:) = reshape(cfar_Data1,[1,N3,N2]);
 end
-Distance = zeros(1,32);
+Distance = [];
 for i = 1:N1
-    f0 = ((Rx(i)-16)/N2)*fs;
+    f0 = ((Rx(i)-17)/N2)*fs;
     Distance(i) = f0*c/2/k;
 end
 %% 距离-帧数图
@@ -55,9 +55,11 @@ Ylabel = (-127:127)/N3*PRF*c/2/fc;
 for i = 1:N1
     final_Data1 = reshape(final_Data(i,:,:),[N3,N2]);
     figure(2);
-    imagesc(Xlabel,Ylabel,fftshift(final_Data1));
+    final_Data1_shift = fftshift(final_Data1);
+    imagesc(Xlabel(100:180),Ylabel(50:200),final_Data1_shift(50:200,100:180));
     xlabel('距离/m');
     ylabel('速度/(m/s)');
     title('单摆RD图像');
-    pause(0.5);
+    pause(0.3)
 end
+toc;
