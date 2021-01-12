@@ -1,78 +1,78 @@
-%% ÉèÖÃ²ÎÊı
-c = 3e8;                 %¹âËÙ
-fc = 10e9;           %ÔØÆµ
-Tp = 10e-6;             %Âö³å¿í¶È£¨s£©
-B =  10e6;               %·¢ÉäĞÅºÅ´ø¿í£¨Hz£©
-K = B/Tp;                %µ÷ÆµÂÊ
-fs = 100e6;              %²ÉÑùÂÊ£¨Hz£©
-R = 3000;                %³õÊ¼²ÉÑù¾àÀë
+%% è®¾ç½®å‚æ•°
+c = 3e8;                 %å…‰é€Ÿ
+fc = 10e9;           %è½½é¢‘
+Tp = 10e-6;             %è„‰å†²å®½åº¦ï¼ˆsï¼‰
+B =  10e6;               %å‘å°„ä¿¡å·å¸¦å®½ï¼ˆHzï¼‰
+K = B/Tp;                %è°ƒé¢‘ç‡
+fs = 100e6;              %é‡‡æ ·ç‡ï¼ˆHzï¼‰
+R = 3000;                %åˆå§‹é‡‡æ ·è·ç¦»
 
-Nr = (2*R/c + Tp) * fs; %¾àÀëÏòµãÊı
-tr = (0:Nr-1)*(1/fs); %¾àÀëÏòÊ±¼ä
-Na = Tp * fs;         %´¿ĞÅºÅ²¿·ÖµãÊı
-% ta = (0:Na-1)*(1/fs);   %¼°ÆäÊ±¼ä
-ta = (-Na/2:Na/2-1)*(1/fs);   %¼°ÆäÊ±¼ä
-f = (0:Na-1)*fs/Na - fs/2; %¼°ÆäÆµÂÊ
+Nr = (2*R/c + Tp) * fs; %è·ç¦»å‘ç‚¹æ•°
+tr = (0:Nr-1)*(1/fs); %è·ç¦»å‘æ—¶é—´
+Na = Tp * fs;         %çº¯ä¿¡å·éƒ¨åˆ†ç‚¹æ•°
+% ta = (0:Na-1)*(1/fs);   %åŠå…¶æ—¶é—´
+ta = (-Na/2:Na/2-1)*(1/fs);   %åŠå…¶æ—¶é—´
+f = (0:Na-1)*fs/Na - fs/2; %åŠå…¶é¢‘ç‡
 
 tdelay = 2*R/c;
-%% »Ø²¨ĞÅºÅÉú³É
-% sr = rectpuls(tr-tdelay-Tp/2,Tp) .* exp(1j*pi*K*(tr-tdelay).^2) .* exp(-1*1j*2*pi*fc*tdelay); %´ø³õÊ¼0Öµ
-sr = rectpuls(tr-tdelay-Tp/2,Tp) .* exp(1j*pi*K*(tr-tdelay-Tp/2).^2) .* exp(-1*1j*2*pi*fc*tdelay); %´ø³õÊ¼0Öµ
-s = exp(1j*pi*K*ta.^2) .* exp(-1*1j*2*pi*fc*tdelay);  %´¿ĞÅºÅ
+%% å›æ³¢ä¿¡å·ç”Ÿæˆ
+% sr = rectpuls(tr-tdelay-Tp/2,Tp) .* exp(1j*pi*K*(tr-tdelay).^2) .* exp(-1*1j*2*pi*fc*tdelay); %å¸¦åˆå§‹0å€¼
+sr = rectpuls(tr-tdelay-Tp/2,Tp) .* exp(1j*pi*K*(tr-tdelay-Tp/2).^2) .* exp(-1*1j*2*pi*fc*tdelay); %å¸¦åˆå§‹0å€¼
+s = exp(1j*pi*K*ta.^2) .* exp(-1*1j*2*pi*fc*tdelay);  %çº¯ä¿¡å·
 fft_s = fftshift(fft(s));
-
+b = 2ï¼›
 figure;
 subplot(221)
 plot(tr*c/2, real(sr));
-xlabel('I(t)¾àÀëµ¥Î»/m')
-ylabel('·ù¶È')
+xlabel('I(t)è·ç¦»å•ä½/m')
+ylabel('å¹…åº¦')
 subplot(222)
 plot(tr*c/2, imag(sr));
-xlabel('Q(t)¾àÀëµ¥Î»/m')
-ylabel('·ù¶È')
-suptitle('»Ø²¨ĞÅºÅ')
+xlabel('Q(t)è·ç¦»å•ä½/m')
+ylabel('å¹…åº¦')
+suptitle('å›æ³¢ä¿¡å·')
 subplot(223)
 plot(f/1e6,20*log10(abs(fft_s)/max(abs(fft_s))));
-xlabel('ÆµÂÊ/MHz')
-ylabel('·ù¶È/dB')
+xlabel('é¢‘ç‡/MHz')
+ylabel('å¹…åº¦/dB')
 subplot(224)
 plot(f/1e6, phase(s));
-xlabel('ÆµÂÊ/MHz')
-ylabel('»¡¶È/rad')
-%% Âö³åÑ¹Ëõ
-S_RC = fft(sr);                                     %¶Ô»Ø²¨ĞÅºÅ½øĞĞfft£¨¾àÀëÏò£© 
-h_RC = ifft(conj(fft(s,round(Nr))));    %Æ¥ÅäÂË²¨º¯Êı    
+xlabel('é¢‘ç‡/MHz')
+ylabel('å¼§åº¦/rad')
+%% è„‰å†²å‹ç¼©
+S_RC = fft(sr);                                     %å¯¹å›æ³¢ä¿¡å·è¿›è¡Œfftï¼ˆè·ç¦»å‘ï¼‰ 
+h_RC = ifft(conj(fft(s,round(Nr))));    %åŒ¹é…æ»¤æ³¢å‡½æ•°    
 figure
-suptitle('²Î¿¼ĞÅºÅ')
+suptitle('å‚è€ƒä¿¡å·')
 subplot(221)
 plot(tr*c/2, real(h_RC))
-xlabel('¾àÀëµ¥Î»/m')
-title('ÂË²¨Æ÷Êµ²¿')
+xlabel('è·ç¦»å•ä½/m')
+title('æ»¤æ³¢å™¨å®éƒ¨')
 subplot(222)
 plot(tr*c/2, imag(h_RC))
-xlabel('¾àÀëµ¥Î»/m')
-title('ÂË²¨Æ÷Ğé²¿')
+xlabel('è·ç¦»å•ä½/m')
+title('æ»¤æ³¢å™¨è™šéƒ¨')
 subplot(223)
 plot(f/1e6, 20*log10(abs(fftshift(fft(h_RC(2001:3000))))/max(abs( fft( h_RC(2000:2999) ) ))))
-xlabel('ÆµÂÊ/MHz')
-title('ÂË²¨Æ÷ÆµÆ×')
+xlabel('é¢‘ç‡/MHz')
+title('æ»¤æ³¢å™¨é¢‘è°±')
 subplot(224)
 plot(f/1e6, phase(h_RC(2001:3000))/pi*180)
-xlabel('ÆµÂÊ/MHz')
-title('ÂË²¨Æ÷ÏàÎ»')
+xlabel('é¢‘ç‡/MHz')
+title('æ»¤æ³¢å™¨ç›¸ä½')
 
-H_RC = fft(h_RC);                                   %¶ÔÆ¥ÅäÂË²¨º¯Êı½øĞĞfft£¨¾àÀëÏò£©
-Sout_RC = S_RC.*H_RC;                              %Æ¥ÅäÂË²¨£¨¾àÀëÏò£©
-s_RC = ifft(Sout_RC);    %¾àÀëÏòÂö³åÑ¹Ëõ½á¹û
+H_RC = fft(h_RC);                                   %å¯¹åŒ¹é…æ»¤æ³¢å‡½æ•°è¿›è¡Œfftï¼ˆè·ç¦»å‘ï¼‰
+Sout_RC = S_RC.*H_RC;                              %åŒ¹é…æ»¤æ³¢ï¼ˆè·ç¦»å‘ï¼‰
+s_RC = ifft(Sout_RC);    %è·ç¦»å‘è„‰å†²å‹ç¼©ç»“æœ
 s_RC_norm = s_RC/max(s_RC);
 figure()
 plot(tr*c/2, 20*log10(abs(s_RC_norm)));
 hold on
 plot([0,4500], [-13.26 -13.26],'r')
 ylim([-150,0])
-xlabel('¾àÀëµ¥Î»/m')
-ylabel('·ù¶È/dB')
-title('ÏÔÊ¾¸±°ê¸ß¶ÈµÄÂö³åÑ¹ËõºóĞÅºÅ');
+xlabel('è·ç¦»å•ä½/m')
+ylabel('å¹…åº¦/dB')
+title('æ˜¾ç¤ºå‰¯ç“£é«˜åº¦çš„è„‰å†²å‹ç¼©åä¿¡å·');
 figure;
 fft_s_out = fftshift(fft(s_RC_norm));
 plot(20*log10(abs(fft_s_out)));

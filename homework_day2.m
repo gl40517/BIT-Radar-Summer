@@ -1,42 +1,42 @@
-%% ÉèÖÃ²ÎÊı
-c = 3e8;                                                              %¹âËÙ
-fc = 10e9;                                                           %ÔØÆµ
+%% è®¾ç½®å‚æ•°
+c = 3e8;                                                              %å…‰é€Ÿ
+fc = 10e9;                                                           %è½½é¢‘
 lambda = c/fc;
-Tp = 10e-6;                                                        %Âö³å¿í¶È£¨s£©
-B =  10e6;                                                          %·¢ÉäĞÅºÅ´ø¿í£¨Hz£©
-K = B/Tp;                                                            %µ÷ÆµÂÊ
-fs = 100e6;                                                         %²ÉÑùÂÊ£¨Hz£©
-Rmax = 3000;                                                     %³õÊ¼²ÉÑù¾àÀë
-PRT = 100e-6;                                                    %Âö³åÖØ¸´ÖÜÆÚ
-PRF = 1/PRT;                                                      %Âö³åÖØ¸´ÆµÂÊ£¨Hz£©
-Nr = round( (2*Rmax/c + Tp) * fs );                                       %¾àÀëÏòµãÊı
-tr = (0:Nr-1)*(1/fs);                                             %¾àÀëÏòÊ±¼ä
-N_signal = Tp * fs;                                                       %´¿ĞÅºÅ²¿·ÖµãÊı
-t_signal = (-N_signal/2:N_signal/2-1)*(1/fs);                                 %¼°ÆäÊ±¼ä
+Tp = 10e-6;                                                        %è„‰å†²å®½åº¦ï¼ˆsï¼‰
+B =  10e6;                                                          %å‘å°„ä¿¡å·å¸¦å®½ï¼ˆHzï¼‰
+K = B/Tp;                                                            %è°ƒé¢‘ç‡
+fs = 100e6;                                                         %é‡‡æ ·ç‡ï¼ˆHzï¼‰
+Rmax = 3000;                                                     %åˆå§‹é‡‡æ ·è·ç¦»
+PRT = 100e-6;                                                    %è„‰å†²é‡å¤å‘¨æœŸ
+PRF = 1/PRT;                                                      %è„‰å†²é‡å¤é¢‘ç‡ï¼ˆHzï¼‰
+Nr = round( (2*Rmax/c + Tp) * fs );                                       %è·ç¦»å‘ç‚¹æ•°
+tr = (0:Nr-1)*(1/fs);                                             %è·ç¦»å‘æ—¶é—´
+N_signal = Tp * fs;                                                       %çº¯ä¿¡å·éƒ¨åˆ†ç‚¹æ•°
+t_signal = (-N_signal/2:N_signal/2-1)*(1/fs);                                 %åŠå…¶æ—¶é—´
 v = 60;
 Na = 64;
-ta = (0:Na-1)/(PRF);       %·½Î»ÏòÊ±¼ä
+ta = (0:Na-1)/(PRF);       %æ–¹ä½å‘æ—¶é—´
 x_target = Rmax - ta*v;
-%% ¼ÆËãËÙ¶ÈÄ£ºıºÍ·Ö±æÂÊ
+%% è®¡ç®—é€Ÿåº¦æ¨¡ç³Šå’Œåˆ†è¾¨ç‡
 delta_f = PRF / Na;
 delta_v = lambda / 2 * delta_f;
-fprintf('ËÙ¶È·Ö±æÂÊÎª%fm/s\n', delta_v);
+fprintf('é€Ÿåº¦åˆ†è¾¨ç‡ä¸º%fm/s\n', delta_v);
 max_v = c* PRF/2 / 2 / fc;
-fprintf('×î´ó²»Ä£ºıËÙ¶ÈÎªÕı¸º%fm/s\n', max_v);
-%% »Ø²¨ĞÅºÅÉú³É
+fprintf('æœ€å¤§ä¸æ¨¡ç³Šé€Ÿåº¦ä¸ºæ­£è´Ÿ%fm/s\n', max_v);
+%% å›æ³¢ä¿¡å·ç”Ÿæˆ
 sr = zeros(Na, Nr);
 
 for n = 1:Na
     tdelay = 2*x_target(n) / c;
     sr(n,:) = rectpuls(tr-tdelay-Tp/2,Tp) .* exp(1i*pi*K*(tr-tdelay-Tp/2).^2) .* exp(-1i*4*pi*x_target(n)/lambda); 
 end
-%% ²Î¿¼ĞÅºÅÉú³É
+%% å‚è€ƒä¿¡å·ç”Ÿæˆ
 % mesh(real(sr))
-s_signal = exp(1j*pi*K*t_signal.^2) .* exp(-1*1j*2*pi*fc*tdelay);  %´¿ĞÅºÅ
+s_signal = exp(1j*pi*K*t_signal.^2) .* exp(-1*1j*2*pi*fc*tdelay);  %çº¯ä¿¡å·
 h_RC = repmat(s_signal, Na,1);
-H_RC = conj(fft( h_RC,  Nr, 2 ));    %Æ¥ÅäÂË²¨º¯Êı 
-%%Âö³å¶àÆÕÀÕ£¨PD£©´¦Àí
-S_RC = fft(sr,[],2);%¶Ô»Ø²¨ĞÅºÅ½øĞĞfft£¨¾àÀëÏò£© 
+H_RC = conj(fft( h_RC,  Nr, 2 ));    %åŒ¹é…æ»¤æ³¢å‡½æ•° 
+%%è„‰å†²å¤šæ™®å‹’ï¼ˆPDï¼‰å¤„ç†
+S_RC = fft(sr,[],2);%å¯¹å›æ³¢ä¿¡å·è¿›è¡Œfftï¼ˆè·ç¦»å‘ï¼‰ 
 S_out = S_RC .* H_RC;
 s_out = ifft(S_out, [], 2);
 S_out_1 = fftshift(fft(s_out), 1);
@@ -44,21 +44,21 @@ f = (-Na/2:Na/2-1)/Na*PRF;
 figure
 [X,Y] = meshgrid(tr*c/2, f/1000);
 mesh(X, Y, abs(S_out_1))
-xlabel('¾àÀëµ¥Î»/m')
-ylabel('ÆµÂÊ/kHz')
-title('¾àÀë-¶àÆÕÀÕÓòÈıÎ¬Í¼')
+xlabel('è·ç¦»å•ä½/m')
+ylabel('é¢‘ç‡/kHz')
+title('è·ç¦»-å¤šæ™®å‹’åŸŸä¸‰ç»´å›¾')
 figure;
 imagesc(tr*c/2, f/1000, abs(S_out_1))
 axis xy
-xlabel('¾àÀëµ¥Î»/m')
-ylabel('ÆµÂÊ/kHz')
-title('¾àÀë-¶àÆÕÀÕÓò¶şÎ¬Í¼')
+xlabel('è·ç¦»å•ä½/m')
+ylabel('é¢‘ç‡/kHz')
+title('è·ç¦»-å¤šæ™®å‹’åŸŸäºŒç»´å›¾')
 figure
 plot(f/1000, 20*log10(abs(S_out_1(:,2000))))
-xlabel('ÆµÂÊ/kHz')
-title('Ñ¡È¡¾àÀë=3km´¦µÄ¶àÆÕÀÕÓò½ØÃæÍ¼')
+xlabel('é¢‘ç‡/kHz')
+title('é€‰å–è·ç¦»=3kmå¤„çš„å¤šæ™®å‹’åŸŸæˆªé¢å›¾')
 
-%% ĞÎĞÄ·¨¼ÆËãËÙ¶È¼°¾àÀë£¨ÓĞ²¹ÁãºÍ¼ÓÔë£©
+%% å½¢å¿ƒæ³•è®¡ç®—é€Ÿåº¦åŠè·ç¦»ï¼ˆæœ‰è¡¥é›¶å’ŒåŠ å™ªï¼‰
 sr = zeros(Na, Nr, 4);
 
 for n = 1:Na
@@ -71,17 +71,17 @@ end
 sr(:, :, 2) = awgn(sr(:, :, 1), 0);
 sr(:, :, 3) = awgn(sr(:, :, 1), 10);
 sr(:, :, 4) = awgn(sr(:, :, 1), 20);
-%% ²Î¿¼ĞÅºÅÉú³É
-s_signal = exp(1j*pi*K*t_signal.^2) .* exp(-1*1j*2*pi*fc*tdelay);  %´¿ĞÅºÅ
+%% å‚è€ƒä¿¡å·ç”Ÿæˆ
+s_signal = exp(1j*pi*K*t_signal.^2) .* exp(-1*1j*2*pi*fc*tdelay);  %çº¯ä¿¡å·
 h_RC = repmat(s_signal, Na,1);
-H_RC = conj(fft( h_RC,  Nr, 2 ));    %Æ¥ÅäÂË²¨º¯Êı 
-%% ĞÎĞÄ·¨¼ÆËã¾àÀëºÍËÙ¶È£¨ÓĞ²¹Áã£©
+H_RC = conj(fft( h_RC,  Nr, 2 ));    %åŒ¹é…æ»¤æ³¢å‡½æ•° 
+%% å½¢å¿ƒæ³•è®¡ç®—è·ç¦»å’Œé€Ÿåº¦ï¼ˆæœ‰è¡¥é›¶ï¼‰
  f = (-Na/2:Na/2-1)/Na*PRF;
- N_process = 8;                                         %Ñ¡È¡8¸öµã½øĞĞ¼ÓÈ¨¼ÆËã
+ N_process = 8;                                         %é€‰å–8ä¸ªç‚¹è¿›è¡ŒåŠ æƒè®¡ç®—
  Final_distance = zeros(1, 4);
  Final_velocity = zeros(1, 4);
- Tr = (0:4*Nr-1) * (1/(4*fs));                      %²¹ÁãºóµÄÊ±¼äÖá¹¹Ôì£¨²¹µ½Ô­³¤µÄ4±¶£©
- f = (0: 8*Na-1) / (8*Na) * PRF;                 %²¹ÁãºóµÄ¶àÆÕÀÕÆµÂÊÖá¹¹Ôì£¨²¹µ½Ô­³¤µÄ8±¶£©
+ Tr = (0:4*Nr-1) * (1/(4*fs));                      %è¡¥é›¶åçš„æ—¶é—´è½´æ„é€ ï¼ˆè¡¥åˆ°åŸé•¿çš„4å€ï¼‰
+ f = (0: 8*Na-1) / (8*Na) * PRF;                 %è¡¥é›¶åçš„å¤šæ™®å‹’é¢‘ç‡è½´æ„é€ ï¼ˆè¡¥åˆ°åŸé•¿çš„8å€ï¼‰
  ready_for_distance = zeros(1, 4*Nr);
  ready_for_velocity = zeros(8*Na, 1);
  
@@ -109,7 +109,7 @@ for i=1:4
     end
     distance = count_distance / count_distance_magnitude;
     Final_distance(i) = distance;
-    %-------------------¾àÀëĞÎĞÄ·¨¼ÆËã------------------
+    %-------------------è·ç¦»å½¢å¿ƒæ³•è®¡ç®—------------------
     count_velocity = 0;
     count_velocity_magnitude = 0;
     for j = -N_process/2: N_process/2 - 1
